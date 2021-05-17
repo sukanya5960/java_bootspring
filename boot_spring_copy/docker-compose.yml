@@ -1,0 +1,45 @@
+version: '3'
+services:
+  java_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: java-app
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "9080:8080"
+    links:
+      - java_db
+    depends_on:
+      - java_db
+    volumes: 
+      - /root/sukanya/boot_spring_copy:/app
+    expose:
+      - "9080"
+    networks:
+      - java-app-network
+
+  #MySQL Service
+  java_db:
+    image: mysql:8.0
+    volumes:
+      - dbdata_java:/var/lib/mysql
+    container_name: java-db
+    restart: unless-stopped
+    ports:
+      - "5306:3306"
+    env_file: .env
+    environment:
+      MYSQL_DATABASE: $DB_DATABASE
+      MYSQL_ROOT_PASSWORD: $DB_PASSWORD
+    networks:
+      - java-app-network
+
+#Docker Networks
+networks:
+   java-app-network:
+      driver: bridge
+#Volumes
+volumes:
+  dbdata_java: {}
